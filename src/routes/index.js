@@ -1,4 +1,4 @@
-const {getAllStudents,getStudentById,createStudent} = require('../controllers/studentController');
+const {getAllStudents,getStudentById,createStudent,editStudent,deleteStudent} = require('../controllers/studentController');
 const {getAllSubjects,getSubjectById} = require('../controllers/subjectCOntroller');
 
 const express = require('express');
@@ -15,13 +15,19 @@ routes.get('/students/:id',getStudentById);
 // Create Student
 routes.post('/students',createStudent);
 
+// Edit Students
+routes.put('/students/:studentid/subjects/:id',editStudent);
+
+// Delete Students
+routes.delete('/students/:id',deleteStudent);
+
 // SUBJECTS
 
 // Get all user
 routes.get('/subjects',getAllSubjects);
 
 // Get Student BY ID
-routes.get('/subjects/:id',getSubjectById);
+routes.get('/subjects/:id/',getSubjectById);
 
 
 

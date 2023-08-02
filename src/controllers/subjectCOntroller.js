@@ -14,7 +14,6 @@ exports.getAllSubjects = async(req,res)=>{
 // Get: Student BY  ID
 exports.getSubjectById = async(req,res)=>{
     try {
-        console.log('checkig parama ',req.params.id);
         const data = await subjects.findOne({id:req.params.id});
         return res.status(200).json({
             data:data
