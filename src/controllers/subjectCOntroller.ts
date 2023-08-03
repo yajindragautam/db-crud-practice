@@ -1,9 +1,10 @@
 import db from '../models';
+import {Request,Response} from 'express'
 
 
-export const getAllSubjects = async(req:any,res:any)=>{
+export const getAllSubjects = async(req:Request,res:Response)=>{
     try {
-        const data = await db.subjects.findAll();
+        const data:object = await db.subjects.findAll();
         return res.status(200).json({
             data:data
         });
@@ -13,9 +14,9 @@ export const getAllSubjects = async(req:any,res:any)=>{
 }
 
 // Get: Student BY  ID
-exports.getSubjectById = async(req:any,res:any)=>{
+export const getSubjectById = async(req:Request,res:Response)=>{
     try {
-        const data = await db.subjects.findOne({id:req.params.id});
+        const data:object = await db.subjects.findOne({where:{id:req.params.id}});
         // If not found
         if(!data){
             return res.status(404).json({

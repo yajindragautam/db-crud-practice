@@ -1,5 +1,5 @@
-const {getAllStudents,getStudentById,createStudent,editStudent,deleteStudent} = require('../controllers/studentController');
-const {getAllSubjects,getSubjectById} = require('../controllers/subjectCOntroller');
+import {getAllStudents,getStudentById,createStudent,editStudent,deleteStudent} from '../controllers/studentController';
+import {getAllSubjects,getSubjectById} from '../controllers/subjectCOntroller';
 
 import express from 'express';
 
@@ -32,4 +32,4 @@ routes.get('/subjects/:id/',getSubjectById);
 
 
 // Export routess
-module.exports = routes;
+export = routes;

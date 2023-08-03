@@ -1,8 +1,9 @@
 import db from '../models';
+import {Request,Response} from 'express'
 
-exports.getAllStudents = async(req,res)=>{
+export const getAllStudents = async(req:Request,res:Response)=>{
     try {
-        const data = await db.students.findAll();
+        const data:object = await db.students.findAll();
         return res.status(200).json({
             data:data
         });
@@ -12,7 +13,7 @@ exports.getAllStudents = async(req,res)=>{
 }
 
 // Get: Student BY  ID
-exports.getStudentById = async(req,res)=>{
+export const getStudentById = async(req:Request,res:Response)=>{
     try {
         const data = await db.students.findOne({where:{id:req.params.id}});
         // If not found
@@ -28,7 +29,7 @@ exports.getStudentById = async(req,res)=>{
         })
         const subEnrolls:Array<object> = [];
         for (let i = 0; i < suArray.length; i++) {
-            const sub = await db.subjects.findAll({where:{id:suArray[i]}});
+            const sub:object = await db.subjects.findAll({where:{id:suArray[i]}});
             // return;
             subEnrolls.push(sub);
         }
@@ -43,9 +44,9 @@ exports.getStudentById = async(req,res)=>{
 }
 
 // Create Student
-exports.createStudent = async(req,res) =>{
+export const createStudent = async(req:Request,res:Response) =>{
     try {
-        const data = {name:req.body.name,email:req.body.email};
+        const data:object = {name:req.body.name,email:req.body.email};
         const {subject} = req.body;
         // Create student
         const studentData = await db.students.create(data);
@@ -81,7 +82,7 @@ exports.createStudent = async(req,res) =>{
 }
 
 // Edit Student
-exports.editStudent = async(req,res)=>{
+export const editStudent = async(req:Request,res:Response)=>{
     try {
         const data = await db.students.findOne({where:{id:req.params.id}});
         const {subject} = req.body;
@@ -127,7 +128,7 @@ exports.editStudent = async(req,res)=>{
 }
 
 // Delete  User
-exports.deleteStudent =async(req,res) =>{
+export const deleteStudent =async(req,res) =>{
     try {
         const data = await db.students.findOne({where:{id:req.params.id}});
         // Check Empty spaces
