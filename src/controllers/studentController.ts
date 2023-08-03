@@ -23,15 +23,18 @@ export const getStudentById = async(req:Request,res:Response)=>{
             });
         }
         const associateSubjectId = await db.student_subjects.findAll({where:{student_id:data.id}})
-        const suArray:Array<number>  = []
+        const suArray:Array<number>  = [];
+        const marksArray:Array<object>  = [];
         associateSubjectId.forEach((item)=>{
             suArray.push(item.subject_id);
+            marksArray.push(item.marks);
         })
         const subEnrolls:Array<object> = [];
         for (let i = 0; i < suArray.length; i++) {
             const sub:object = await db.subjects.findAll({where:{id:suArray[i]}});
             // return;
-            subEnrolls.push(sub);
+            subEnrolls.push(sub,{marks:marksArray[i]});
+            // subEnrolls.push();
         }
         return res.status(200).json({
             student:data,
