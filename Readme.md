@@ -1,5 +1,11 @@
 # Database and CRUP Assignment
 
+## How TO Configure Project
+- **Clone the project and open in Code editor.**
+- **There are two branch `main` and `tsbranch`.Where `main` constin JS code and `tsbranch` contains Typescript code.**
+- **Run `yarn` or `npm init`it will download all the packages used in project.**
+- **Start project: `yarn dev`.**
+
 ## Create Database
 `
 CREATE DATABASE "practiceDB"
