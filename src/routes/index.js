@@ -3,7 +3,6 @@ const {getAllSubjects,getSubjectById} = require('../controllers/subjectCOntrolle
 
 const express = require('express');
 const routes =  express.Router();
-console.log(getAllStudents);
 
 
 // Get all user
@@ -16,7 +15,7 @@ routes.get('/students/:id',getStudentById);
 routes.post('/students',createStudent);
 
 // Edit Students
-routes.put('/students/:studentid/subjects/:id',editStudent);
+routes.put('/students/:id',editStudent);
 
 // Delete Students
 routes.delete('/students/:id',deleteStudent);
