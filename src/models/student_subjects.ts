@@ -1,9 +1,6 @@
 'use strict';
 
-const students = require('./students');
-const subjects = require('./students');
-
-module.exports = (sequelize, DataTypes) => {
+module.exports = (sequelize:any, DataTypes:any) => {
   let modelDefinition = {
     id:{
       type: DataTypes.INTEGER,
@@ -23,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
  
 
   const studentSubjectModule =  sequelize.define('student_subjects', modelDefinition,modelOptions);
-  studentSubjectModule.associate = (models) => {
+  studentSubjectModule.associate = (models:any) => {
     studentSubjectModule.belongsToMany(models.students, {foreignKey: 'id', 'as': 'studentsDetails',through:'id'});
     studentSubjectModule.belongsToMany(models.subjects, {foreignKey: 'id', 'as': 'subjectsDetails',through:'id'});
 

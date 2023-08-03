@@ -1,7 +1,7 @@
 'use strict';
 
 
-module.exports = (sequelize, DataTypes) => {
+module.exports = (sequelize:any, DataTypes:any) => {
   let modelDefinition = {
     id:{
       type: DataTypes.INTEGER,

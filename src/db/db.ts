@@ -1,9 +1,8 @@
 require("dotenv").config();
 
 const connectUrl = process.env.DBCONFIG;
-console.log('Check connection string :',connectUrl);
 
-const connectTODatabase = () =>{
+export const connectTODatabase = ():void =>{
     try {
         const Sequelize = require('sequelize'), postgres = new Sequelize(connectUrl, {
             logging: false,
@@ -28,4 +27,5 @@ const connectTODatabase = () =>{
 }
 
 
-module.exports = connectTODatabase;
+// Exporting
+// export = {connectTODatabase}

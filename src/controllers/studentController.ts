@@ -1,6 +1,6 @@
-const {students,student_subjects,subjects}   = require('../models');
+import {students,student_subjects,subjects}   from '../models';
 
-exports.getAllStudents = async(req,res)=>{
+exports.getAllStudents = async(req:any,res:any)=>{
     try {
         const data = await students.findAll();
         return res.status(200).json({
@@ -12,7 +12,7 @@ exports.getAllStudents = async(req,res)=>{
 }
 
 // Get: Student BY  ID
-exports.getStudentById = async(req,res)=>{
+exports.getStudentById = async(req:any,res:any)=>{
     try {
         const data = await students.findOne({id:req.params.id});
         return res.status(200).json({
@@ -24,7 +24,7 @@ exports.getStudentById = async(req,res)=>{
 }
 
 // Create Student
-exports.createStudent = async(req,res) =>{
+exports.createStudent = async(req:any,res:any) =>{
     try {
         const data = {name:req.body.name,email:req.body.email};
         const {subject, studentsubData} = req.body;
@@ -57,7 +57,7 @@ exports.createStudent = async(req,res) =>{
 }
 
 // Edit Student
-exports.editStudent = async(req,res)=>{
+exports.editStudent = async(req:any,res:any)=>{
     try {
         const data = await students.findOne({where:{id:req.params.studentid}});
         const {subject, studentsubData} = req.body;
@@ -109,7 +109,7 @@ exports.editStudent = async(req,res)=>{
 }
 
 // Delete  User
-exports.deleteStudent =async(req,res) =>{
+exports.deleteStudent =async(req:any,res:any) =>{
     try {
         const data = await students.findOne({where:{id:req.params.id}});
         // Check Empty spaces

@@ -1,10 +1,11 @@
 require('dotenv').config();
-const bodyParser = require('body-parser');
-const connectTODatabase = require('./src/db/db');
-const express = require('express');
+import bodyParser from 'body-parser';
+import {connectTODatabase} from './src/db/db';
+// iport express 
+import express from 'express';
 
 // CReating express app
-const app = express();
+const app = express();  
 
 
 app.use(express.json());
@@ -16,7 +17,7 @@ app.use(bodyParser.json())
 
 // Import ROUTES
 app.use(require('./src/routes/index'))
-
+ 
 const PORT = 7000 || process.env.PORT;
 //Creating Server
 app.listen(PORT,()=>{

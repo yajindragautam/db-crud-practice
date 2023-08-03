@@ -3,7 +3,6 @@ const {getAllSubjects,getSubjectById} = require('../controllers/subjectCOntrolle
 
 const express = require('express');
 const routes =  express.Router();
-console.log(getAllStudents);
 
 
 // Get all user
