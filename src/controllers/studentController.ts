@@ -1,8 +1,8 @@
-import {students,student_subjects,subjects}   from '../models';
+import db from '../models';
 
-exports.getAllStudents = async(req:any,res:any)=>{
+exports.getAllStudents = async(req,res)=>{
     try {
-        const data = await students.findAll();
+        const data = await db.students.findAll();
         return res.status(200).json({
             data:data
         });
@@ -12,40 +12,64 @@ exports.getAllStudents = async(req:any,res:any)=>{
 }
 
 // Get: Student BY  ID
-exports.getStudentById = async(req:any,res:any)=>{
+exports.getStudentById = async(req,res)=>{
     try {
-        const data = await students.findOne({id:req.params.id});
+        const data = await db.students.findOne({where:{id:req.params.id}});
+        // If not found
+        if(!data){
+            return res.status(404).json({
+                message:'Student Not Found..!'
+            });
+        }
+        const associateSubjectId = await db.student_subjects.findAll({where:{student_id:data.id}})
+        const suArray:Array<number>  = []
+        associateSubjectId.forEach((item)=>{
+            suArray.push(item.subject_id);
+        })
+        const subEnrolls:Array<object> = [];
+        for (let i = 0; i < suArray.length; i++) {
+            const sub = await db.subjects.findAll({where:{id:suArray[i]}});
+            // return;
+            subEnrolls.push(sub);
+        }
         return res.status(200).json({
-            data:data
-        });
+            student:data,
+            enrollSUbject:subEnrolls
+        })
+        // const subjectEnrolls = 
     } catch (err) {
         console.log(err);
     }
 }
 
 // Create Student
-exports.createStudent = async(req:any,res:any) =>{
+exports.createStudent = async(req,res) =>{
     try {
         const data = {name:req.body.name,email:req.body.email};
-        const {subject, studentsubData} = req.body;
+        const {subject} = req.body;
         // Create student
-        const studentData = await students.create(data);
-        // Create subject
-        const subjectData = await subjects.create(subject[0]);
-        // Create Student SUbject
-        const studentSubjectData = await student_subjects.create(
-            {   
-                student_id:studentData.id,
-                subject_id:subjectData.id,
-                marks:studentsubData[0]['marks'],
+        const studentData = await db.students.create(data);
+        subject.forEach(async(item)=>{
+            // Check if the subject code matched
+            const checkSUbCode = await db.subjects.findOne({where:{code:item.code}});
+            
+            if(!checkSUbCode){
+                return res.status(404).json({
+                    message:"Subject code not found",
+                });
             }
-            );
+            await db.student_subjects.create({
+                student_id:studentData.id,
+                subject_id:checkSUbCode.id,
+                marks: item.marks
+            });
+        })
       
         return res.status(201).json({
-            message:'Created Successfully',
-            data:[studentData,subjectData,studentSubjectData]
+            message:'Student Created Successfully',
+            data:studentData
         })
-    } catch (err) {
+    } catch (err:any) {
         console.log(err);
         return res.status(400).json(
             {
@@ -57,39 +81,33 @@ exports.createStudent = async(req:any,res:any) =>{
 }
 
 // Edit Student
-exports.editStudent = async(req:any,res:any)=>{
+exports.editStudent = async(req,res)=>{
     try {
-        const data = await students.findOne({where:{id:req.params.studentid}});
-        const {subject, studentsubData} = req.body;
+        const data = await db.students.findOne({where:{id:req.params.id}});
+        const {subject} = req.body;
         // Check Empty spaces
+        // If not found
         if(!data){
             return res.status(404).json({
-                message:"User Not Fount..!"
-            })
+                message:'Student Not Found..!'
+            });
         }
-        // check if student with their id exit in studetn subjects table
-        //if yes list all subject which student have enroller and update marks
-        // Take a subject is from paramas
-        // Update student subject student_id
-        const checkStudentSubject = await student_subjects.findAll({where:{student_id:data.id}});
-        if(checkStudentSubject.length < 0){
-            return res.status(400).json({
-                message:"Student is not associated withany subjects"
-            })
-        }
-        const studentSubIdArray = [];
-        for (let i = 0; i < checkStudentSubject.length; i++) {
-            console.log('chekc data',studentsubData[0]['marks']);
-             await student_subjects.update({marks:studentsubData[0]['marks']},{where:{id:checkStudentSubject[i].id}})
-             studentSubIdArray.push(checkStudentSubject[i].subject_id);
-        }
-        studentSubIdArray.forEach(async(item)=>{
-             await subjects.findAll({where:{id:item}});
-             await subjects.update(subject[0],{where:{id:item}})
-            // Check if the subject with id exit is s
-            
-        });
-        await students.update({name:req.body.name},{where:{id:req.params.studentid}});
+        subject.forEach(async(item)=>{
+            // Check if the subject code matched
+            const checkSUbCode = await db.subjects.findOne({where:{code:item.code}});
+            if(!checkSUbCode){
+                return res.status(404).json({
+                    message:"Subject code not found",
+                });
+            }
+            await db.student_subjects.create({
+                student_id:data.id,
+                subject_id:checkSUbCode.id,
+                marks: item.marks
+            });
+        })
+        
+        await db.students.update({name:req.body.name,email:req.body.email},{where:{id:req.params.id}});
         return res.status(200).json({
             message:"Student and Subjects updated success..",
             data:{
@@ -97,7 +115,7 @@ exports.editStudent = async(req:any,res:any)=>{
                 // findAllSubjects
             }
         })
-    } catch (err) {
+    } catch (err:any) {
         console.log(err);
         return res.status(400).json(
             {
@@ -109,22 +127,22 @@ exports.editStudent = async(req:any,res:any)=>{
 }
 
 // Delete  User
-exports.deleteStudent =async(req:any,res:any) =>{
+exports.deleteStudent =async(req,res) =>{
     try {
-        const data = await students.findOne({where:{id:req.params.id}});
+        const data = await db.students.findOne({where:{id:req.params.id}});
         // Check Empty spaces
         if(!data){
             return res.status(404).json({
                 message:"User Not Fount..!"
             })
         }
-        await students.destroy({where:{id:req.params.id}});
+        await db.students.destroy({where:{id:req.params.id}});
         return res.status(202).json(
             {
                 message:"Student deleted success ..!",            
             }
         );
-    } catch (err) {
+    } catch (err:any) {
         console.log(err);
         return res.status(400).json(
             {

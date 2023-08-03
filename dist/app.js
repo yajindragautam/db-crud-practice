@@ -8,6 +8,7 @@ const body_parser_1 = __importDefault(require("body-parser"));
 const db_1 = require("./src/db/db");
 // iport express 
 const express_1 = __importDefault(require("express"));
+const models_1 = __importDefault(require("./src/models"));
 // CReating express app
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
@@ -19,9 +20,11 @@ app.use(body_parser_1.default.json());
 app.use(require('./src/routes/index'));
 const PORT = 7000 || process.env.PORT;
 //Creating Server
-app.listen(PORT, () => {
-    console.log(`App is runnign on port ${PORT}`);
-    console.log(`Click here http://localhost:${PORT}`);
+models_1.default.sequelize.sync().then(() => {
+    app.listen(PORT, () => {
+        console.log(`App is runnign on port ${PORT}`);
+        console.log(`Click here http://localhost:${PORT}`);
+    });
 });
 // Import DB Connections
 (0, db_1.connectTODatabase)();

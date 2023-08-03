@@ -1,7 +1,8 @@
 const {getAllStudents,getStudentById,createStudent,editStudent,deleteStudent} = require('../controllers/studentController');
 const {getAllSubjects,getSubjectById} = require('../controllers/subjectCOntroller');
 
-const express = require('express');
+import express from 'express';
+
 const routes =  express.Router();
 
 
@@ -15,7 +16,7 @@ routes.get('/students/:id',getStudentById);
 routes.post('/students',createStudent);
 
 // Edit Students
-routes.put('/students/:studentid/subjects/:id',editStudent);
+routes.put('/students/:id',editStudent);
 
 // Delete Students
 routes.delete('/students/:id',deleteStudent);

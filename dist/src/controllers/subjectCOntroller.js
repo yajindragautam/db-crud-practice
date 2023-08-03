@@ -8,11 +8,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const models_1 = require("../models");
-exports.getAllSubjects = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.getAllSubjects = void 0;
+const models_1 = __importDefault(require("../models"));
+const models_2 = __importDefault(require("../models"));
+const getAllSubjects = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const data = yield models_1.subjects.findAll();
+        const data = yield models_2.default.subjects.findAll();
         return res.status(200).json({
             data: data
         });
@@ -21,10 +26,11 @@ exports.getAllSubjects = (req, res) => __awaiter(void 0, void 0, void 0, functio
         console.log(err);
     }
 });
+exports.getAllSubjects = getAllSubjects;
 // Get: Student BY  ID
 exports.getSubjectById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const data = yield models_1.subjects.findOne({ id: req.params.id });
+        const data = yield models_1.default.findOne({ id: req.params.id });
         return res.status(200).json({
             data: data
         });

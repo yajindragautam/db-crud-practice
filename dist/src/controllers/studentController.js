@@ -8,11 +8,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const models_1 = require("../models");
+const models_1 = __importDefault(require("../models"));
+const models_2 = __importDefault(require("../models"));
+const models_3 = __importDefault(require("../models"));
 exports.getAllStudents = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const data = yield models_1.students.findAll();
+        const data = yield models_2.default.findAll();
         return res.status(200).json({
             data: data
         });
@@ -24,10 +29,22 @@ exports.getAllStudents = (req, res) => __awaiter(void 0, void 0, void 0, functio
 // Get: Student BY  ID
 exports.getStudentById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const data = yield models_1.students.findOne({ id: req.params.id });
-        return res.status(200).json({
-            data: data
+        const data = yield models_2.default.findOne({ id: req.params.id });
+        const associateSubjectId = yield models_3.default.findAll({ where: { student_id: data.id } });
+        const suArray = [];
+        associateSubjectId.forEach((item) => {
+            suArray.push(item.subject_id);
         });
+        const subEnrolls = [];
+        for (let i = 0; i < suArray.length; i++) {
+            const sub = yield models_1.default.findAll({ where: { id: suArray[i] } });
+            subEnrolls.push(sub);
+        }
+        return res.status(200).json({
+            student: data,
+            enrollSUbject: subEnrolls
+        });
+        // const subjectEnrolls = 
     }
     catch (err) {
         console.log(err);
@@ -37,63 +54,62 @@ exports.getStudentById = (req, res) => __awaiter(void 0, void 0, void 0, functio
 exports.createStudent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const data = { name: req.body.name, email: req.body.email };
-        const { subject, studentsubData } = req.body;
+        const { subject } = req.body;
         // Create student
-        const studentData = yield models_1.students.create(data);
-        // Create subject
-        const subjectData = yield models_1.subjects.create(subject[0]);
-        // Create Student SUbject
-        const studentSubjectData = yield models_1.student_subjects.create({
-            student_id: studentData.id,
-            subject_id: subjectData.id,
-            marks: studentsubData[0]['marks'],
-        });
+        const studentData = yield models_2.default.create(data);
+        subject.forEach((item) => __awaiter(void 0, void 0, void 0, function* () {
+            // Check if the subject code matched
+            const checkSUbCode = yield models_1.default.findOne({ where: { code: item.code } });
+            if (!checkSUbCode) {
+                return res.status(404).json({
+                    message: "Subject code not found",
+                });
+            }
+            yield models_3.default.create({
+                student_id: studentData.id,
+                subject_id: checkSUbCode.id,
+                marks: item.marks
+            });
+        }));
         return res.status(201).json({
-            message: 'Created Successfully',
-            data: [studentData, subjectData, studentSubjectData]
+            message: 'Student Created Successfully',
+            data: studentData
         });
     }
     catch (err) {
         console.log(err);
         return res.status(400).json({
-            err: err.name,
-            description: err.errors
+        // err:err.name,            
+        // description: err.errors
         });
     }
 });
 // Edit Student
 exports.editStudent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const data = yield models_1.students.findOne({ where: { id: req.params.studentid } });
-        const { subject, studentsubData } = req.body;
+        const data = yield models_2.default.findOne({ where: { id: req.params.id } });
+        const { subject } = req.body;
         // Check Empty spaces
         if (!data) {
             return res.status(404).json({
                 message: "User Not Fount..!"
             });
         }
-        // check if student with their id exit in studetn subjects table
-        //if yes list all subject which student have enroller and update marks
-        // Take a subject is from paramas
-        // Update student subject student_id
-        const checkStudentSubject = yield models_1.student_subjects.findAll({ where: { student_id: data.id } });
-        if (checkStudentSubject.length < 0) {
-            return res.status(400).json({
-                message: "Student is not associated withany subjects"
+        subject.forEach((item) => __awaiter(void 0, void 0, void 0, function* () {
+            // Check if the subject code matched
+            const checkSUbCode = yield models_1.default.findOne({ where: { code: item.code } });
+            if (!checkSUbCode) {
+                return res.status(404).json({
+                    message: "Subject code not found",
+                });
+            }
+            yield models_3.default.create({
+                student_id: data.id,
+                subject_id: checkSUbCode.id,
+                marks: item.marks
             });
-        }
-        const studentSubIdArray = [];
-        for (let i = 0; i < checkStudentSubject.length; i++) {
-            console.log('chekc data', studentsubData[0]['marks']);
-            yield models_1.student_subjects.update({ marks: studentsubData[0]['marks'] }, { where: { id: checkStudentSubject[i].id } });
-            studentSubIdArray.push(checkStudentSubject[i].subject_id);
-        }
-        studentSubIdArray.forEach((item) => __awaiter(void 0, void 0, void 0, function* () {
-            yield models_1.subjects.findAll({ where: { id: item } });
-            yield models_1.subjects.update(subject[0], { where: { id: item } });
-            // Check if the subject with id exit is s
         }));
-        yield models_1.students.update({ name: req.body.name }, { where: { id: req.params.studentid } });
+        yield models_2.default.update({ name: req.body.name, email: req.body.email }, { where: { id: req.params.id } });
         return res.status(200).json({
             message: "Student and Subjects updated success..",
             data: {
@@ -105,22 +121,22 @@ exports.editStudent = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     catch (err) {
         console.log(err);
         return res.status(400).json({
-            err: err.name,
-            description: err.errors
+        // err:err.name,            
+        // description: err.errors
         });
     }
 });
 // Delete  User
 exports.deleteStudent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const data = yield models_1.students.findOne({ where: { id: req.params.id } });
+        const data = yield models_2.default.findOne({ where: { id: req.params.id } });
         // Check Empty spaces
         if (!data) {
             return res.status(404).json({
                 message: "User Not Fount..!"
             });
         }
-        yield models_1.students.destroy({ where: { id: req.params.id } });
+        yield models_2.default.destroy({ where: { id: req.params.id } });
         return res.status(202).json({
             message: "Student deleted success ..!",
         });
@@ -128,8 +144,8 @@ exports.deleteStudent = (req, res) => __awaiter(void 0, void 0, void 0, function
     catch (err) {
         console.log(err);
         return res.status(400).json({
-            err: err.name,
-            description: err.errors
+        // err:err.name,            
+        // description: err.errors
         });
     }
 });
