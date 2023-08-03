@@ -14,7 +14,12 @@ exports.getAllStudents = async(req,res)=>{
 // Get: Student BY  ID
 exports.getStudentById = async(req,res)=>{
     try {
-        const data = await students.findOne({id:req.params.id});
+        const data = await students.findOne({where:{id:req.params.id}});
+        if(!data){
+            return res.status(404).json({
+                message:"Student  not found",
+            });
+        };
         const associateSubjectId = await student_subjects.findAll({where:{student_id:data.id}})
         const suArray = []
         associateSubjectId.forEach((item)=>{
@@ -101,10 +106,7 @@ exports.editStudent = async(req,res)=>{
         await students.update({name:req.body.name,email:req.body.email},{where:{id:req.params.id}});
         return res.status(200).json({
             message:"Student and Subjects updated success..",
-            data:{
-                data
-                // findAllSubjects
-            }
+            
         })
     } catch (err) {
         console.log(err);
