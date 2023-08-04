@@ -14,6 +14,7 @@ exports.getAllStudents = async(req,res)=>{
 // Get: Student BY  ID
 exports.getStudentById = async(req,res)=>{
     try {
+        // subjects: [{code: sub.code, marks: uArray.filter()}]
         const data = await students.findOne({where:{id:req.params.id}});
         if(!data){
             return res.status(404).json({
@@ -22,19 +23,23 @@ exports.getStudentById = async(req,res)=>{
         };
         const associateSubjectId = await student_subjects.findAll({where:{student_id:data.id}})
         const suArray = [];
-        const marksArray = [];
         associateSubjectId.forEach((item)=>{
-            suArray.push(item.subject_id);
-            marksArray.push(item.marks);
+            suArray.push(item);
+            // marksArray.push(item.marks);
         })
-        const subEnrolls = [];
+        let results = [];
         for (let i = 0; i < suArray.length; i++) {
-            const sub = await subjects.findAll({where:{id:suArray[i]}});
-            subEnrolls.push(sub,{marks:marksArray[i]});
+            // students have: subject-name sub-code
+            const sub = await subjects.findAll({where:{id:suArray[i].subject_id}});
+            sub.forEach(async(item)=>{   
+                const {id,code,name} = item;
+                results.push({'id :':id,'Subject Code':code,'Subject Name :': name,'Marks :': suArray[i].marks});
+            })
         }
+        
         return res.status(200).json({
-            student:data,
-            enrollSUbject:subEnrolls
+            students:data,
+            enrollSubject:results
         })
         // const subjectEnrolls = 
     } catch (err) {
