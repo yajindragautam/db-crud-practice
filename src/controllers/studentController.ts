@@ -15,30 +15,32 @@ export const getAllStudents = async(req:Request,res:Response)=>{
 // Get: Student BY  ID
 export const getStudentById = async(req:Request,res:Response)=>{
     try {
+        // subjects: [{code: sub.code, marks: uArray.filter()}]
         const data = await db.students.findOne({where:{id:req.params.id}});
-        // If not found
         if(!data){
             return res.status(404).json({
-                message:'Student Not Found..!'
+                message:"Student  not found",
             });
-        }
+        };
         const associateSubjectId = await db.student_subjects.findAll({where:{student_id:data.id}})
-        const suArray:Array<number>  = [];
-        const marksArray:Array<object>  = [];
+        const suArray:Array<any> = [];
         associateSubjectId.forEach((item)=>{
-            suArray.push(item.subject_id);
-            marksArray.push(item.marks);
+            suArray.push(item);
+            // marksArray.push(item.marks);
         })
-        const subEnrolls:Array<object> = [];
+        let results:Array<object> = [];
         for (let i = 0; i < suArray.length; i++) {
-            const sub:object = await db.subjects.findAll({where:{id:suArray[i]}});
-            // return;
-            subEnrolls.push(sub,{marks:marksArray[i]});
-            // subEnrolls.push();
+            // students have: subject-name sub-code
+            const sub = await db.subjects.findAll({where:{id:suArray[i].subject_id}});
+            sub.forEach(async(item)=>{   
+                const {id,code,name} = item;
+                results.push({'id :':id,'Subject Code':code,'Subject Name :': name,'Marks :': suArray[i].marks});
+            })
         }
+        
         return res.status(200).json({
-            student:data,
-            enrollSUbject:subEnrolls
+            students:data,
+            enrollSubject:results
         })
         // const subjectEnrolls = 
     } catch (err) {
