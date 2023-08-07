@@ -34,7 +34,7 @@ export const getStudentById = async(req:Request,res:Response)=>{
             const sub = await db.subjects.findAll({where:{id:suArray[i].subject_id}});
             sub.forEach(async(item)=>{   
                 const {id,code,name} = item;
-                results.push({'id :':id,'Subject Code':code,'Subject Name :': name,'Marks :': suArray[i].marks});
+                results.push({'id ':id,'Subject Code':code,'Subject Name': name,'Marks ': suArray[i].marks});
             })
         }
         
