@@ -244,3 +244,23 @@ $BODY$;
 
 ALTER FUNCTION public.deleteStudent(integer)
     OWNER TO postgres;
+
+
+-- Create a trigger function
+CREATE OR REPLACE FUNCTION link_subjects_to_student()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Insert student-subject associations for each subject
+    INSERT INTO student_subjects (student_id, subject_id)
+    SELECT NEW.id, id FROM subjects;
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create a trigger that fires after inserting a new student
+CREATE TRIGGER after_insert_student
+AFTER INSERT ON students
+FOR EACH ROW
+EXECUTE FUNCTION link_subjects_to_student();
+
