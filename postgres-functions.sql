@@ -1,45 +1,50 @@
--- FUNCTION: public.create_student(character varying, character varying, JSONB)
+-- FUNCTION: public.create_student(character varying, character varying, jsonb)
 
--- DROP FUNCTION IF EXISTS public.create_student(character varying, character varying, JSONB);
+-- DROP FUNCTION IF EXISTS public.create_student(character varying, character varying, jsonb);
 
 CREATE OR REPLACE FUNCTION public.create_student(
     p_name character varying,
     p_email character varying,
-    p_subjects JSONB
-)
-RETURNS jsonb 
+    p_subjects jsonb)
+RETURNS jsonb
 LANGUAGE 'plpgsql'
 COST 100
 VOLATILE PARALLEL UNSAFE
 AS $BODY$
 DECLARE
     new_id INTEGER;
-    subject_record JSONB;
     subject_code TEXT;
-    subject_id INTEGER;
 BEGIN
     -- Insert into students and return the ID
     INSERT INTO students (name, email) VALUES (p_name, p_email) RETURNING id INTO new_id;
     
-    -- Iterate through subjects in the JSONB array
-    FOR subject_record IN SELECT * FROM jsonb_array_elements(p_subjects)
-    LOOP
-        -- Extract subject code and marks
-        subject_code := subject_record->>'code';
-        subject_id := (SELECT id FROM subjects WHERE code = subject_code);
-        
-        -- Insert into student_subject table
-        INSERT INTO student_subjects (student_id, subject_id, marks) VALUES (new_id, subject_id, (subject_record->>'marks')::INTEGER);
-    END LOOP;
+    -- Create a temporary table to hold the extracted subjects
+    CREATE TEMP TABLE temp_subjects (	
+        code TEXT,
+        marks INTEGER
+    );
+    
+    -- Insert the extracted subjects into the temporary table
+    INSERT INTO temp_subjects (code, marks)
+    SELECT (elem->>'code'), (elem->>'marks')::INTEGER
+    FROM jsonb_array_elements(p_subjects) AS elem;
+    
+    -- Insert into student_subjects table using a single query
+    INSERT INTO student_subjects (student_id, subject_id, marks)
+    SELECT new_id, s.id, ts.marks
+    FROM temp_subjects ts
+    JOIN subjects s ON ts.code = s.code;
+    
+    -- Drop the temporary table
+    DROP TABLE temp_subjects;
     
     -- Return response
     RETURN jsonb_build_object('message', 'Student created and subjects added');
 END;
 $BODY$;
 
-ALTER FUNCTION public.create_student(character varying, character varying, JSONB)
+ALTER FUNCTION public.create_student(character varying, character varying, jsonb)
     OWNER TO postgres;
-
 
 -- Update students details 
 -- FUNCTION: public.edit_student(character varying, character varying, JSONB)
@@ -103,21 +108,20 @@ ALTER FUNCTION public.edit_student(character varying, character varying, JSONB)
     OWNER TO postgres;
 	
 	
--- Get Student By Id show associated subjects as well
--- FUNCTION: public.getStudentById(integer)
+-- FUNCTION: public.getstudentbyid(integer)
 
--- DROP FUNCTION IF EXISTS public.getStudentById(integer);
+-- DROP FUNCTION IF EXISTS public.getstudentbyid(integer);
 
-CREATE OR REPLACE FUNCTION public.getStudentById(
-    p_id integer
-)
-RETURNS jsonb 
-LANGUAGE 'plpgsql'
-COST 100
-VOLATILE PARALLEL UNSAFE
+CREATE OR REPLACE FUNCTION public.getstudentbyid(
+	p_id integer)
+    RETURNS jsonb
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
 AS $BODY$
 DECLARE
     student_record jsonb;
+	subject_record jsonb;
 BEGIN
     -- Search for student by ID
     SELECT 
@@ -147,24 +151,19 @@ BEGIN
                 'Marks', ss.marks
             )
         ) AS enrollSubject
-    INTO student_record
+    INTO subject_record
     FROM student_subjects ss
     JOIN subjects subj ON ss.subject_id = subj.id
     WHERE ss.student_id = p_id;
     
     -- Combine student details and enrolled subjects
-    RETURN jsonb_build_object('students', student_record);
+    RETURN jsonb_build_object('students', student_record,'subjects',subject_record);
 END;
 $BODY$;
 
-ALTER FUNCTION public.getStudentById(integer)
+ALTER FUNCTION public.getstudentbyid(integer)
     OWNER TO postgres;
 
--- Get All Students
-
--- FUNCTION: public.getAllStudents()
-
--- DROP FUNCTION IF EXISTS public.getAllStudents();
 
 CREATE OR REPLACE FUNCTION public.getAllStudents()
 RETURNS jsonb 
