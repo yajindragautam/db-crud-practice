@@ -1,4 +1,5 @@
 require("dotenv").config();
+import { Client }  from 'pg';
 
 const connectUrl = process.env.DBCONFIG;
 
@@ -26,6 +27,3 @@ export const connectTODatabase = ():void =>{
     }
 }
 
-
-// Exporting
-// export = {connectTODatabase}

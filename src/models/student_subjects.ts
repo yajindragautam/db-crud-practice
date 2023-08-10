@@ -24,6 +24,6 @@ module.exports = (sequelize:any, DataTypes:any) => {
     studentSubjectModule.belongsToMany(models.students, {foreignKey: 'id', 'as': 'studentsDetails',through:'id'});
     studentSubjectModule.belongsToMany(models.subjects, {foreignKey: 'id', 'as': 'subjectsDetails',through:'id'});
 
-};
+  };
   return studentSubjectModule;
 };

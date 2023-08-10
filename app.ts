@@ -15,7 +15,8 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 
 // Import ROUTES
-app.use(require('./src/routes/index'))
+app.use(require('./src/routes/index'));
+app.use(require('./src/routes/translation'));
  
 const PORT = 7000 || process.env.PORT;
 //Creating Server
