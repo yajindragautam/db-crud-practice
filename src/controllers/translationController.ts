@@ -1,4 +1,3 @@
-import db from '../models';
 import {Request,Response} from 'express';
 import client from '../db/db1';
 
@@ -7,8 +6,9 @@ import client from '../db/db1';
 export const createTranaslation = async(req:Request,res:Response) =>{
     try {
         const {translationcode,translations} = req.body;
+        // Query to database
         const query = "SELECT create_translation($1,$2)"
-        client.query(query,[translationcode,translations], (err, result) => {
+        client.query(query,[JSON.stringify(translationcode),JSON.stringify(translations)], (err, result) => {
             if (err) {
               console.error('Error executing query:', err);
             } else {
