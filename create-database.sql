@@ -66,15 +66,3 @@ DELETE COLUMN marks
 -- Insert Data in students_subjects Table
 INSERT INTO student_subjects(student_id,subject_id,marks)
 VALUES(1,1,'85.9')
-
-
-
--- TRANSLATION SECTION STARTS FROM HERE 
-
-
--- Create a locales tables
-CREATE TABLE locales(
-	id SERIAL PRIMARY KEY,
-	code Varchar(20),
-	UNIQUE(code)
-);

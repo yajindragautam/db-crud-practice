@@ -1,4 +1,3 @@
-
 -- Create a locales tables
 CREATE TABLE locales(
 	id SERIAL PRIMARY KEY,
@@ -6,21 +5,19 @@ CREATE TABLE locales(
 	UNIQUE(code)
 );
 
--- Create a translationcodes tables
-
+-- Create a translationcodes table
 CREATE TABLE translationcodes(
 	id SERIAL PRIMARY KEY,
-	translationcode Varchar(20),
-	UNIQUE(translationcode)
+	translationcode VARCHAR(20),
+	UNIQUE(translationcode),
 );
 
--- CReate a translations table
-
+-- Create a translations table
 CREATE TABLE translations(
 	id SERIAL PRIMARY KEY,
-	translationcodeid interger,
-	test varchar not null,
-	localeid integer,
-    FOREIGN KEY (translationcodeid) REFERENCES translationcodes (id) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (localeid) REFERENCES locales (id) ON DELETE CASCADE ON UPDATE CASCADE
+	translationcodeid INTEGER,
+	languagetext TEXT,
+	localeid INTEGER,
+	FOREIGN KEY (translationcodeid) REFERENCES translationcodes (id) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (localeid) REFERENCES locales (id) ON DELETE CASCADE ON UPDATE CASCADE 
 );
