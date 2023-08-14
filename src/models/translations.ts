@@ -10,7 +10,7 @@ module.exports = (sequelize:any, DataTypes:any) => {
       autoIncrement: true
     },
     translationcodeid: {type: DataTypes.INTEGER,unique: true, index: true},
-    translationcode: {type: DataTypes.STRING},
+    languagetext: {type: DataTypes.STRING},
     localeid: {type: DataTypes.INTEGER}
     
   };

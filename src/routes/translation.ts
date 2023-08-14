@@ -1,17 +1,26 @@
-import  express from "express";
-import {Request,Response} from 'express'
-import {createTranaslation} from '../controllers/translationController';
+import express from "express";
+import {
+  createTranaslation,
+  editTranaslation,
+  getTranaslationById,
+  getTranaslation,
+} from "../controllers/translationController";
 
 // Create a route
 const routes = express.Router();
 
-// test
-routes.get('/translations',(req:Request,res:Response)=>{
-    return res.status(200).json({message:"Transaltion route is working good."});
-});
+// Get
+routes.get("/translations", getTranaslation);
 
 // Create Translation
-routes.post("/translations",createTranaslation);
+routes.post("/translations", createTranaslation);
+
+// Edit Translation
+
+routes.put("/translations/:id", editTranaslation);
+
+// Get Translation by id
+routes.get("/translations/:id", getTranaslationById);
 
 // Export
 export = routes;
