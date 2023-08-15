@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import db from "../models";
 import sequelize from "../db/db";
 
 // Create Translations
@@ -14,7 +13,7 @@ export const createTranaslation = async (req: Request, res: Response) => {
     });
 
     return res.status(201).json({
-      message: "Created Successfully",
+      message: "Created Translation Successfully",
       //   data: result.message,
     });
   } catch (err: any) {
@@ -37,12 +36,7 @@ export const editTranaslation = async (req: Request, res: Response) => {
     const result = await sequelize.query(query, {
       replacements: { transId, translationcode, strTrans },
     });
-    // Disconnect from the PostgreSQL database
-    console.log("Function result:", result);
-
-    // client.end();
-    // console.log('check translation data :',data);
-
+   
     return res.status(201).json({
       message: "Updated Successfully",
       // data: result?.data
@@ -60,22 +54,17 @@ export const editTranaslation = async (req: Request, res: Response) => {
 export const getTranaslationById = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
-    const query = "SELECT gettranslationbyid(:id)";
-    // [req.params.id]
+    const query = "SELECT * FROM gettranslationbyid(:id)";
     const result: any = await sequelize.query(query, {
       replacements: { id },
     });
-    // Disconnect from the PostgreSQL database
-    // console.log("Function result:",result);
-    let opt;
-    result[0].map((item: any) => {
-      const { text, localcode, translationcode } = item;
-      // console.log(item);
-      opt = item;
-    });
 
     return res.status(201).json({
-      data: opt,
+      TranslationById: result[0].map((item: any) => ({
+        languagetext: item.gettranslationbyid.text,
+        localcode: item.gettranslationbyid.localcode,
+        translationcode: item.gettranslationbyid.translationcode,
+      })),
     });
   } catch (err: any) {
     console.log(err);
@@ -88,20 +77,31 @@ export const getTranaslationById = async (req: Request, res: Response) => {
 
 export const getTranaslation = async (req: Request, res: Response) => {
   try {
-    const query = "SELECT getalltranaslation()";
+    let { pageNo, page, search } = req.query;
+    // (localcode = undefined) ? (localcode = null!) : localcode;
+    search === undefined ? (search = null!) : search;
+    console.log("page :", page, "pageNo", pageNo, "search :", search);
+    const query = "SELECT * FROM getalltranaslation(:pageNo,:page,:search)";
     // [req.params.id]
-    const result: any = await sequelize.query(query);
-    // console.log(result);
-    const outputData ={
-      Translations: result[0].map((row: any) => ({
-        translationcodeid: row.getalltranaslation[0].translationcodeid,
-        translations:[{
-          languagetext: row.getalltranaslation[0].languagetext,
-          localeid: row.getalltranaslation[0].localeid
-        }]
-      })),
-    } 
-    return res.status(200).json(outputData)
+    const result: any = await sequelize.query(query, {
+      replacements: { pageNo, page, search },
+    });
+    console.log("data :", JSON.stringify(result[0]));
+
+    // const outputData ={
+    //   Translations: result[0].map((row: any,i) => (
+    //     {
+    //     test: row.getalltranaslation,
+    //     translationcodeid: row.getalltranaslation[i].translationcodeid,
+    //     translations:[{
+    //       languagetext: row.getalltranaslation[i].languagetext,
+    //       localeid: row.getalltranaslation[i].localeid
+    //     }]
+    //   }))
+    // }
+
+    // result[0][0].getalltranaslation
+    return res.status(200).json(result[0]);
   } catch (err: any) {
     console.log(err);
     return res.status(400).json({

@@ -31,3 +31,17 @@ SELECT deleteStudent(1);
 
 -- Execute this to test trigger function
 INSERT INTO students(name,email)VALUES('Yajindra','email@gmail.com');
+
+
+
+-- BELOW ARE THE TRANSCTIONS QUERY -------------
+
+-- Get all from locales
+SELECT * FROM locales
+
+
+-- Get all from translationcodes
+SELECT * FROM translationcodes
+
+-- Get all from translations
+Get * FROM translations

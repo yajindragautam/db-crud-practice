@@ -5,6 +5,9 @@ CREATE TABLE locales(
 	UNIQUE(code)
 );
 
+-- SQL Query to insert data inside locales table
+CREATE TABLE locales(code) VALUES('np','in','tam','mai','eng','chi','th','newa'); 
+
 -- Create a translationcodes table
 CREATE TABLE translationcodes(
 	id SERIAL PRIMARY KEY,
