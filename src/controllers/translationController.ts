@@ -8,16 +8,15 @@ export const createTranaslation = async (req: Request, res: Response) => {
     const strTrans = JSON.stringify(translations);
     // Query to database [JSON.stringify(translationcode),JSON.stringify(translations)]
     const query = "SELECT create_translation(:translationcode,:strTrans)";
-    const result = await sequelize.query(query, {
+    const result:any = await sequelize.query(query, {
       replacements: { translationcode, strTrans },
     });
 
-    return res.status(201).json({
-      message: "Created Translation Successfully",
-      //   data: result.message,
+    return res.json({
+        data: result[0],
     });
   } catch (err: any) {
-    // console.log(err);
+    console.log(err);
     return res.status(400).json({
       err: err.name,
       description: err.errors[0]?.message,
@@ -38,8 +37,7 @@ export const editTranaslation = async (req: Request, res: Response) => {
     });
    
     return res.status(201).json({
-      message: "Updated Successfully",
-      // data: result?.data
+      data: result[0],
     });
   } catch (err: any) {
     console.log(err);
@@ -77,16 +75,17 @@ export const getTranaslationById = async (req: Request, res: Response) => {
 
 export const getTranaslation = async (req: Request, res: Response) => {
   try {
-    let { pageNo, page, search } = req.query;
-    // (localcode = undefined) ? (localcode = null!) : localcode;
+    let { pageNo, page, search,localecode } = req.query;
+    (localecode === undefined) ? (localecode = null!) : localecode;
+    (pageNo === undefined) ? (pageNo = null!) : pageNo;
+    (page === undefined) ? (page = null!) : page;
     search === undefined ? (search = null!) : search;
-    console.log("page :", page, "pageNo", pageNo, "search :", search);
-    const query = "SELECT * FROM getalltranaslation(:pageNo,:page,:search)";
+    // console.log("page :", page, "pageNo", pageNo, "search :", search,"localecode :", localecode);
+    const query = "SELECT * FROM getalltranaslation(:pageNo,:page,:search,:localecode)";
     // [req.params.id]
     const result: any = await sequelize.query(query, {
-      replacements: { pageNo, page, search },
+      replacements: { pageNo, page, search,localecode},
     });
-    console.log("data :", JSON.stringify(result[0]));
 
     // const outputData ={
     //   Translations: result[0].map((row: any,i) => (
