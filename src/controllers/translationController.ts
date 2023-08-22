@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import db from "../models";
 import {createExcel} from '../helpers/createxcel';
 import { createAndSendEmail } from "../helpers/mailsender";
+import path from 'path';
 import { Op } from "sequelize";
 import sequelize from "../db/db";
 
@@ -136,9 +137,11 @@ export const getTranslationReport = async (req: Request, res: Response) => {
     });
 
     // Create a excel file set data
-    const buffer = await createExcel(tsData,res);
+    const buffer:any = await createExcel(tsData,res);
     const email = req.query.email;
-    await createAndSendEmail(email, buffer);
+    let cmsUrl = process.env.CMS_URL || `http://localhost:${process.env.PORT}`;
+    
+    await createAndSendEmail(email, buffer[0],cmsUrl.concat('download/:',path.basename(buffer[1])));
     // Send the buffer as the response
     return res.status(200).json({
       message:"Email Sent Success..!",
@@ -148,3 +151,15 @@ export const getTranslationReport = async (req: Request, res: Response) => {
     console.log(err);
   }
 };
+
+
+// Download CSV file
+
+export const downloadCSVFile = (req:Request,res:Response)=>{
+  try {
+    const fileUrl = path.join(__dirname,`../../public/downloads/${req.params.url.replace(":", "")}`);
+    return res.download(fileUrl);   
+  } catch (err) {
+    console.log(err);
+  }
+}

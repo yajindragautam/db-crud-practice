@@ -4,7 +4,8 @@ import {
   editTranaslation,
   getTranaslationById,
   getTranaslation,
-  getTranslationReport
+  getTranslationReport,
+  downloadCSVFile
 } from "../controllers/translationController";
 // import {validate} from '../middlewares'
 import {emailValidator} from '../validators/mailValidator';
@@ -27,6 +28,9 @@ routes.put("/translations/:id", editTranaslation);
 
 // Get Translation by id
 routes.get("/translations/:id", getTranaslationById);
+
+// Download CSV FILE
+routes.get('/download/:url',downloadCSVFile)
 
 
 

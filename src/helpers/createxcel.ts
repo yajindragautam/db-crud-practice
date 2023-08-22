@@ -1,6 +1,7 @@
 "user strict";
 
 import ExcelJS from "exceljs";
+import {saveBufferToFile} from './fileHelpers';
 
 export const createExcel = async (tsData,res) => {
   try {
@@ -60,7 +61,10 @@ export const createExcel = async (tsData,res) => {
     );
     // Serialize the workbook to a buffer
     const buffer = await workbook.xlsx.writeBuffer();
-    return buffer;
+    // Create and save that file inside downloads
+    const savedPath = await saveBufferToFile(buffer,'translations');
+    
+    return [buffer,savedPath];
   } catch (err) {
     console.log(err);
   }
