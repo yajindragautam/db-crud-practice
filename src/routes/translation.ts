@@ -8,13 +8,14 @@ import {
   downloadCSVFile
 } from "../controllers/translationController";
 // import {validate} from '../middlewares'
+import { check, validationResult ,checkSchema} from 'express-validator';
 import {emailValidator} from '../validators/mailValidator';
 
 // Create a route
 const routes = express.Router();
 
 // Get Translation Reports
-routes.get("/translations/report", getTranslationReport);
+routes.get("/translations/report", emailValidator,getTranslationReport);
 
 // Get
 routes.get("/translations", getTranaslation);

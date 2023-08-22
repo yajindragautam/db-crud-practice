@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import db from "../models";
-import {createExcel} from '../helpers/createxcel';
+import { createExcel } from "../helpers/createxcel";
 import { createAndSendEmail } from "../helpers/mailsender";
-import path from 'path';
+import path from "path";
 import { Op } from "sequelize";
+import { check, validationResult } from "express-validator";
 import sequelize from "../db/db";
 
 // Create Translations
@@ -132,34 +133,41 @@ export const getTranslationReport = async (req: Request, res: Response) => {
     //     },
     //   ],
     // }
+    // Check for validation errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
     const tsData = await db.translations.findAll({
       attributes: { exclude: ["createdat", "updatedat"] },
     });
 
     // Create a excel file set data
-    const buffer:any = await createExcel(tsData,res);
+    const buffer: any = await createExcel(tsData, res);
     const email = req.query.email;
     let cmsUrl = process.env.CMS_URL || `http://localhost:${process.env.PORT}`;
-    
+
     await createAndSendEmail(email, buffer[0],cmsUrl.concat('download/:',path.basename(buffer[1])));
     // Send the buffer as the response
     return res.status(200).json({
-      message:"Email Sent Success..!",
-      details:"Please check your email to down file."
+      message: "Email Sent Success..!",
+      details: "Please check your email to down file.",
     });
   } catch (err) {
     console.log(err);
   }
 };
 
-
 // Download CSV file
 
-export const downloadCSVFile = (req:Request,res:Response)=>{
+export const downloadCSVFile = (req: Request, res: Response) => {
   try {
-    const fileUrl = path.join(__dirname,`../../public/downloads/${req.params.url.replace(":", "")}`);
-    return res.download(fileUrl);   
+    const fileUrl = path.join(
+      __dirname,
+      `../../public/downloads/${req.params.url.replace(":", "")}`
+    );
+    return res.download(fileUrl);
   } catch (err) {
     console.log(err);
   }
-}
+};

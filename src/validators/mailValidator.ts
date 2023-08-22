@@ -1,12 +1,10 @@
-import { checkSchema } from 'express-validator';
+import { check } from 'express-validator';
 
-export const emailValidator = checkSchema({
-    email: {
-        isEmpty:{
-            errorMessage:"Email cannot be empty..!"
-        },
-        isEmail:{
-            errorMessage:"Invalid Email Format..!"
-        }
-    },
-})
+export const emailValidator = [
+    check('email')
+      .notEmpty()
+      .withMessage('Email is required')
+      .isEmail()
+      .withMessage('Invalid email format'),
+];
+  
