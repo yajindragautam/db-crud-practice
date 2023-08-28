@@ -1,12 +1,5 @@
 import express from "express";
-import {
-  createTranaslation,
-  editTranaslation,
-  getTranaslationById,
-  getTranaslation,
-  getTranslationReport,
-  downloadCSVFile
-} from "../controllers/translationController";
+import {TranslationController} from "../controllers/translationController";
 // import {validate} from '../middlewares'
 import { check, validationResult ,checkSchema} from 'express-validator';
 import {emailValidator} from '../validators/mailValidator';
@@ -14,24 +7,26 @@ import {emailValidator} from '../validators/mailValidator';
 // Create a route
 const routes = express.Router();
 
-// Get Translation Reports
-routes.get("/translations/report", emailValidator,getTranslationReport);
+// // Get Translation Reports
+// routes.get("/translations/report", emailValidator,getTranslationReport);
 
-// Get
-routes.get("/translations", getTranaslation);
+// // Get
+// routes.get("/translations", getTranaslation);
 
 // Create Translation
-routes.post("/translations", createTranaslation);
+routes.post("/translations", (req,res) =>{
+  new TranslationController().createTranaslation(req,res)
+});
 
-// Edit Translation
+// // Edit Translation
 
-routes.put("/translations/:id", editTranaslation);
+// routes.put("/translations/:id", editTranaslation);
 
-// Get Translation by id
-routes.get("/translations/:id", getTranaslationById);
+// // Get Translation by id
+// routes.get("/translations/:id", getTranaslationById);
 
-// Download CSV FILE
-routes.get('/download/:url',downloadCSVFile)
+// // Download CSV FILE
+// routes.get('/download/:url',downloadCSVFile)
 
 
 

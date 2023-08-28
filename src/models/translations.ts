@@ -1,30 +1,39 @@
 'use strict';
+const Sequelize = require('sequelize');
+const moment = require( "moment");
 
 
-module.exports = (sequelize:any, DataTypes:any) => {
-  let modelDefinition = {
-    id:{
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      allowNull: false,
-      autoIncrement: true
+module.exports  = {
+
+  Translations : function(context){
+
+    const model = context.define('Translations', {
+      id:{
+        type: Sequelize.DataTypes.INTEGER,
+        primaryKey: true,
+        allowNull: false,
+        autoIncrement: true
+      },
+      translationcodeid: {type: Sequelize.DataTypes.INTEGER,unique: true, index: true},
+      languagetext: {type: Sequelize.DataTypes.STRING},
+      localeid: {type: Sequelize.DataTypes.INTEGER}
+      
     },
-    translationcodeid: {type: DataTypes.INTEGER,unique: true, index: true},
-    languagetext: {type: DataTypes.STRING},
-    localeid: {type: DataTypes.INTEGER}
-    
-  };
-  let modelOptions = {
-    createdAt: 'createdat',
-    updatedAt: 'updatedat'
-  };
+    {
+      createdAt: 'createdat',
+      tableName: 'translations',
+      updatedAt: 'updatedat'
+    });
+
+    return  model;
+  }
+ 
   
-  const translationCodeModule =  sequelize.define('translations', modelDefinition,modelOptions);
-  translationCodeModule.associate = (models:any) => {
-    translationCodeModule.belongsToMany(models.locals, {foreignKey: 'id', 'as': 'localDetails',through:'id'});
-    translationCodeModule.belongsToMany(models.translationcodes, {foreignKey: 'id', 'as': 'translationCodesDetails',through:'id'});
+  // const translationCodeModule =  sequelize.define('translations', modelDefinition,modelOptions);
+  // translationCodeModule.associate = (models:any) => {
+  //   translationCodeModule.belongsToMany(models.locals, {foreignKey: 'id', 'as': 'localDetails',through:'id'});
+  //   translationCodeModule.belongsToMany(models.translationcodes, {foreignKey: 'id', 'as': 'translationCodesDetails',through:'id'});
 
-  };
+  // };
 
-  return  translationCodeModule;
 };

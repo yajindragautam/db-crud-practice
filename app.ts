@@ -1,5 +1,5 @@
 require('dotenv').config();
-require('./src/db/db');
+import {connectTODatabase} from './src/db/db';
 import bodyParser from 'body-parser';
 // iport express 
 import express from 'express';
@@ -15,7 +15,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 // Import ROUTES
-app.use(require('./src/routes/index'));
 app.use(require('./src/routes/translation'));
  
 const PORT =  process.env.PORT || 7000 ;
@@ -25,3 +24,6 @@ app.listen(PORT, () => {
     console.log(`App is runnign on port ${PORT}`);
     console.log(`Click here http://localhost:${PORT}`);
 })
+
+
+connectTODatabase();
