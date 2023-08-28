@@ -7,11 +7,15 @@ import {emailValidator} from '../validators/mailValidator';
 // Create a route
 const routes = express.Router();
 
-// // Get Translation Reports
-// routes.get("/translations/report", emailValidator,getTranslationReport);
+// Get Translation Reports
+routes.get("/translations/report", emailValidator,(req,res)=>{
+  new TranslationController().getTranslationReport(req,res);
+});
 
-// // Get
-// routes.get("/translations", getTranaslation);
+// Get
+routes.get("/translations", (req,res)=>{
+  new TranslationController().getTranaslation(req,res);
+});
 
 // Create Translation
 routes.post("/translations", (req,res) =>{
@@ -20,13 +24,19 @@ routes.post("/translations", (req,res) =>{
 
 // // Edit Translation
 
-// routes.put("/translations/:id", editTranaslation);
+routes.put("/translations/:id", (req,res)=>{
+  new TranslationController().editTranaslation(req,res);
+});
 
-// // Get Translation by id
-// routes.get("/translations/:id", getTranaslationById);
+// Get Translation by id
+routes.get("/translations/:id", (req,res)=>{
+  new TranslationController().getTranaslationById(req,res);
+});
 
 // // Download CSV FILE
-// routes.get('/download/:url',downloadCSVFile)
+routes.get('/download/:url',(req,res)=>{
+  new TranslationController().downloadCSVFile(req,res);
+});
 
 
 
