@@ -7,39 +7,35 @@ import { TranslationService } from "../services/TranslationService";
 import { TranslationMapper } from "../mapper/TranslationMapper";
 import path from "path";
 import { Op } from "sequelize";
+import * as log from "../../logger";
 import { check, validationResult } from "express-validator";
 // import sequelize from "../db/db";
 
 export class TranslationController {
-  async createTranaslation(req: Request, res: Response) {
+  async createTranaslation(req: Request, res: Response, next) {
     const context = await Connect();
     try {
       let translationService = new TranslationService(context);
 
       const { translationcode, translations } = req.body;
       const strTrans = JSON.stringify(translations);
-      // Query to database [JSON.stringify(translationcode),JSON.stringify(translations)]
-      // const query = "SELECT create_translation(:translationcode,:strTrans)";
-      // const result: any = await sequelize.query(query, {
-      //   replacements: { translationcode, strTrans },
-      // });
-      let result = await translationService.create(translationcode, strTrans);
-      // let mapper = new TranslationMapper();
-      // let dtos = await mapper.ModeltoDTO(result,context);
 
-      return res.status(200).json({
+      let result = await translationService.create(translationcode, strTrans);
+
+      // if(!result[0]?.create_translation.message){
+      //   console.log('status :',result[0].create_translation.status.split("-")[0]);
+      // }
+      
+      return res.status(201).json({
         data: result[0],
       });
     } catch (err: any) {
-      console.log(err);
-      return res.status(400).json({
-        err: err.name,
-        description: err.errors[0]?.message,
-      });
+      // console.log(err);
+      next(err);
     }
   }
 
-  async editTranaslation(req:Request,res:Response){
+  async editTranaslation(req: Request, res: Response,next) {
     const context = await Connect();
     try {
       let translationService = new TranslationService(context);
@@ -47,22 +43,23 @@ export class TranslationController {
       const { translationcode, translations } = req.body;
       const strTrans = JSON.stringify(translations);
       const transId = req.params.id;
-   
-      const result = await translationService.editTranslations(transId,translationcode,strTrans);
-  
+
+      const result = await translationService.editTranslations(
+        transId,
+        translationcode,
+        strTrans
+      );
+
       return res.status(201).json({
         data: result[0],
       });
     } catch (err: any) {
-      console.log(err);
-      return res.status(400).json({
-        err: err.name,
-        description: err.errors[0]?.message,
-      });
+      // console.log(err);
+      next(err);
     }
   }
 
-  async getTranaslationById(req: Request, res: Response) {
+  async getTranaslationById(req: Request, res: Response, next) {
     const context = await Connect();
     try {
       let translationService = new TranslationService(context);
@@ -74,8 +71,9 @@ export class TranslationController {
       // });
       const result = await translationService.getById(id);
 
-      return res.status(201).json({
+      return res.status(200).json({
         TranslationById: result.map((item: any) => ({
+          message: item.gettranslationbyid.message || "",
           languagetext: item.gettranslationbyid.text,
           localcode: item.gettranslationbyid.localcode,
           translationcode: item.gettranslationbyid.translationcode,
@@ -83,14 +81,16 @@ export class TranslationController {
       });
     } catch (err: any) {
       console.log(err);
-      return res.status(400).json({
-        err: err.name,
-        description: err.errors[0]?.message,
-      });
+      
+      //   err: err.name,
+      //   // description: err.errors[0]?.message,
+      //   description: err?.parent,
+      // });
+      next(err);
     }
   }
 
-  async getTranaslation(req: Request, res: Response) {
+  async getTranaslation(req: Request, res: Response,next) {
     const context = await Connect();
     try {
       let translationService = new TranslationService(context);
@@ -117,15 +117,16 @@ export class TranslationController {
       // result[0][0].getalltranaslation
       return res.status(200).json(result[0]);
     } catch (err: any) {
-      console.log(err);
-      return res.status(400).json({
-        err: err.name,
-        description: err.errors[0]?.message,
-      });
+      // console.log(err);
+      // return res.status(400).json({
+      //   err: err.name,
+      //   description: err.errors[0]?.message,
+      // });
+      next(err);
     }
   }
 
-  async getTranslationReport(req: Request, res: Response) {
+  async getTranslationReport(req: Request, res: Response,next) {
     const context = await Connect();
     try {
       let translationService = new TranslationService(context);
@@ -157,11 +158,12 @@ export class TranslationController {
         details: "Please check your email to down file.",
       });
     } catch (err: any) {
-      console.log(err);
-      return res.status(400).json({
-        err: err.name,
-        description: err.errors[0]?.message,
-      });
+      // console.log(err);
+      // return res.status(400).json({
+      //   err: err.name,
+      //   description: err.errors[0]?.message,
+      // });
+      next(err);
     }
   }
 

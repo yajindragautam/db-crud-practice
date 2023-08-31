@@ -8,29 +8,29 @@ import {emailValidator} from '../validators/mailValidator';
 const routes = express.Router();
 
 // Get Translation Reports
-routes.get("/translations/report", emailValidator,(req,res)=>{
-  new TranslationController().getTranslationReport(req,res);
+routes.get("/translations/report", emailValidator,(req,res,next)=>{
+  new TranslationController().getTranslationReport(req,res,next);
 });
 
 // Get
-routes.get("/translations", (req,res)=>{
-  new TranslationController().getTranaslation(req,res);
+routes.get("/translations", (req,res,next)=>{
+  new TranslationController().getTranaslation(req,res,next);
 });
 
 // Create Translation
-routes.post("/translations", (req,res) =>{
-  new TranslationController().createTranaslation(req,res)
+routes.post("/translations", (req,res,next) =>{
+  new TranslationController().createTranaslation(req,res,next)
 });
 
 // // Edit Translation
 
-routes.put("/translations/:id", (req,res)=>{
-  new TranslationController().editTranaslation(req,res);
+routes.put("/translations/:id", (req,res,next)=>{
+  new TranslationController().editTranaslation(req,res,next);
 });
 
 // Get Translation by id
-routes.get("/translations/:id", (req,res)=>{
-  new TranslationController().getTranaslationById(req,res);
+routes.get("/translations/:id", (req,res,next)=>{
+  new TranslationController().getTranaslationById(req,res,next);
 });
 
 // // Download CSV FILE
